@@ -1,17 +1,18 @@
 import numpy as np
 import quadprog
 #%% 
-def quadprog_solve_qp(P,C,m=None): # , q, G=None, h=None, A=None, b=None):
+def quadprog_solve_qp(P,y,C,m=None): # , q, G=None, h=None, A=None, b=None):
     if m is None:
         m = P.shape[0]
+    dtype = P.dtype
     q = -np.ones((m, ))
     # print('q_dtype: {}'.format(q.dtype))
     G = np.vstack((np.eye(m)*-1,np.eye(m)))
     h = np.hstack((np.zeros(m), np.ones(m) * C))
 
     qp_G = .5 * (P + P.T)   # make sure P is symmetric
-    A = None
-    b = None
+    A = y.astype(dtype).reshape(1,-1)
+    b = 0.0
     qp_a = -q
     if A is not None:
         qp_C = -np.vstack([A, G]).T
