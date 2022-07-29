@@ -31,12 +31,21 @@ class SVMK(BaseEstimator,ClassifierMixin):
         except:
             alpha = (U@S@U.T@alpha_t).real
         _SV_index = np.where(alpha != 0)[0]
-        self.alpha_SV = alpha[_SV_index]
+        self.alphas_SV = alpha[_SV_index]
         self.X_sv = X[_SV_index]
         self.y_sv = y[_SV_index]
         self._SV_index = _SV_index
         
-        Ysv = (self.alpha_SV*self.y_sv).reshape(1,-1).repeat(self.X_sv.shape[0],axis=0)
+        Ysv = (self.alphas_SV*self.y_sv).reshape(1,-1).repeat(self.X_sv.shape[0],axis=0)
         b = np.mean(self.y_sv - (self.kernel(self.X_sv,self.X_sv)*Ysv).sum(axis=1))
         self.b = b
+        self.whos_min = whos_min
+        self.whos_maj = whos_maj
+        self.labels = labels
         return self
+    def predict(self,Xtest):
+        Ysv = (self.alphas_SV*self.y_sv).reshape(1,-1).repeat(Xtest.shape[0],axis=0)
+        y_est = np.sign(np.sum(self.kernel(Xtest,self.X_sv)*Ysv,axis=1) + self.b)
+        t_est = np.ones_like(y_est)*self.labels[self.whos_min]
+        t_est[y_est==-1] = self.labels[self.whos_maj]
+        return t_est
