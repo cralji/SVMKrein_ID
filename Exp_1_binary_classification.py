@@ -94,8 +94,7 @@ for path_dataset in paths_file[-2:]:
         for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
             kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
         params_grids = [
-                        {'clf__c11': C_list,
-                         'clf__c21': C_list,
+                        {'clf__C': C_list,
                          'clf__kernel': kernels
                         }
                       ]
@@ -138,7 +137,7 @@ for path_dataset in paths_file[-2:]:
                                                                     acc[-1],
                                                                     gm[-1],
                                                                     f1[-1]))
-            model_path = './results_RFF-TWSVM/model_{}_{}_f{}.p'.format(name_model,path_dataset[7:-4],f)
+            model_path = './results/model_{}_{}_f{}.p'.format(name_model,path_dataset[7:-4],f)
             # model_path_tf = './results/model_{}_f{}.h5'.format(path_dataset[7:-4],f)
             # grid_search.best_estimator_[1].model.save(model_path_tf)
             #model_path = './results/model_{}_f{}.p'.format(path_dataset[7:-4],f)  #'model_sujeto_'+str(sbj)+'_cka_featuresCSP_BCI2a_acc.p'
@@ -157,7 +156,7 @@ for path_dataset in paths_file[-2:]:
                                             'T_pred':T_est
                                             }
             
-        dump(results_dict,'./results_RFF-TWSVM/results_{}_f{}.joblib'.format(path_dataset[7:-4],f))   #'sujeto_'+str(sbj)+'_cka_featuresCSP_BCI2a_acc.joblib')
+        dump(results_dict,'./results/results_{}_f{}.joblib'.format(path_dataset[7:-4],f))   #'sujeto_'+str(sbj)+'_cka_featuresCSP_BCI2a_acc.joblib')
         f += 1
 
 
