@@ -1,5 +1,5 @@
 import numpy as np
-from utils import quadprog_solve_qp,Krein_EIG
+from SVM_Krein.utils import quadprog_solve_qp,Krein_EIG
 from sklearn.base import BaseEstimator,ClassifierMixin
 from sklearn.gaussian_process.kernels import DotProduct
 

@@ -5,7 +5,7 @@ import numpy as np
 import os
 from time import time
 
-from SVM_Krein.estimators import SVM_Krein
+from SVM_Krein.estimators import SVMK
 from SVM_Krein.kernels import tanh_kernel
 
 from sklearn.base import BaseEstimator,TransformerMixin,ClassifierMixin
@@ -33,7 +33,7 @@ import pickle
 
 steps = [
          [('zscore',StandardScaler()),
-          ('clf',SVM_Krein())]
+          ('clf',SVMK())]
         ]
 
 
