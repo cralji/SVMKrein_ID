@@ -5,14 +5,17 @@ import pandas as pd
 from tqdm import tqdm
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+
+from SVM_Krein.estimators import SVMK
+from SVM_Krein.kernels import tanh_kernel
+
 import joblib
 #%% 
 # models_name = ['ETWSVM_krein']
 # folders_results = ['./results_RFF-TWSVM/']
 
-models_name = ['TWSVM_krein']
-folders_results = ['./results_TWSVM-Krein/']
+models_name = ['SVMK']
+folders_results = ['./results/']
 
 datasets = os.listdir('./data')
 datasets.sort()
@@ -21,6 +24,7 @@ datasets = [dataset.split('.')[0] for dataset in datasets if '.dat' in dataset]
 #%%
 datasets.remove('page-blocks0')
 datasets.remove('segment0')
+# datasets.remove('Cryotherapy')
 #
 
 template = '{}results_{}_f{}.joblib'
@@ -64,5 +68,5 @@ df = pd.DataFrame(X,columns=name_columns,index=index)
 print(df)
 
 # %%
-df.to_excel('./TWSVM_krein.xlsx')
+df.to_excel('./SVM_krein.xlsx')
 # %%
