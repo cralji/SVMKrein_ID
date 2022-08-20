@@ -50,6 +50,7 @@ paths_file.sort()
 
 paths_file.remove('./data/page-blocks0.dat')
 paths_file.remove('./data/segment0.dat')
+paths_file.remove('./data/Cryotherapy.xlsx')
 
 
 #%%
@@ -64,7 +65,7 @@ scores = {'acc': 'accuracy',
 # path_dataset = paths_file[1]
 
 
-for path_dataset in paths_file[-2:]:
+for path_dataset in paths_file:
     data = pd.read_table(path_dataset,delimiter=',',header=None).to_numpy()
     # Data
     X,t = data[:,0:-1].astype(np.float32),data[:,-1].astype(np.str)
@@ -158,8 +159,3 @@ for path_dataset in paths_file[-2:]:
             
         dump(results_dict,'./results/results_{}_f{}.joblib'.format(path_dataset[7:-4],f))   #'sujeto_'+str(sbj)+'_cka_featuresCSP_BCI2a_acc.joblib')
         f += 1
-
-
-
-
-#%%
