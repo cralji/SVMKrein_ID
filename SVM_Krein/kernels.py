@@ -4,7 +4,7 @@ from scipy.spatial.distance import cdist
 from numpy import maximum,sqrt,cos,sin,concatenate
 from numpy.random import rand
 
-from utils import GRFF
+from SVM_Krein.utils import GRFF
 #%%
 class tanh_kernel:
     def __init__(self,
@@ -49,8 +49,8 @@ class GRFF_kernel:
         self.kern_neg = kern_neg
     
     def __call__(self,X,Y):
-        Phi_x = concatenate( (self.kern_pos*cos(X.dot(self.Wpos)),self.kern_pos*sin(X.dot(self.Wpos)),-self.kern_neg*cos(X.dot(self.Wneg)),-self.kern_neg*sin(X.dot(self.Wneg)) ) )
-        Phi_y = concatenate( (self.kern_pos*cos(Y.dot(self.Wpos)),self.kern_pos*sin(Y.dot(self.Wpos)), self.kern_neg*cos(Y.dot(self.Wneg)), self.kern_neg*sin(Y.dot(self.Wneg)) ) )
+        Phi_x = concatenate( (self.kern_pos*cos(X.dot(self.Wpos)),self.kern_pos*sin(X.dot(self.Wpos)),-self.kern_neg*cos(X.dot(self.Wneg)),-self.kern_neg*sin(X.dot(self.Wneg)) ) ,axis=1)
+        Phi_y = concatenate( (self.kern_pos*cos(Y.dot(self.Wpos)),self.kern_pos*sin(Y.dot(self.Wpos)), self.kern_neg*cos(Y.dot(self.Wneg)), self.kern_neg*sin(Y.dot(self.Wneg)) ) ,axis=1)
 
         K = Phi_x.dot(Phi_y.T)
         return K

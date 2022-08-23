@@ -6,7 +6,7 @@ import os
 from time import time
 
 from SVM_Krein.estimators import SVMK
-from SVM_Krein.kernels import tanh_kernel
+from SVM_Krein.kernels import tanh_kernel,GRFF_kernel
 
 from sklearn.base import BaseEstimator,TransformerMixin,ClassifierMixin
 from sklearn.preprocessing import StandardScaler
@@ -88,12 +88,13 @@ for path_dataset in paths_file:
     for train_index, test_index in cv1.split(X, y,y):
         Xtrain,t_train = X[train_index],y[train_index]
         Xtest,t_test = X[test_index],y[test_index]
-        
+        d = Xtrain.shape[1]
         s0 = np.median(pdist(Xtrain))
         kernels = []
         gamma_list = [s for s in np.linspace(.1*s0,1.2*s0,5)]
-        for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
-            kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
+        for sf in [1,1.5,2,3]:
+            for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
+                kernels.append( GRFF_kernel(d=d,s =int(sf*d),params_kernel={'sigmas':s,'a':[1.0,-1.00001]} ) )
         params_grids = [
                         {'clf__C': C_list,
                          'clf__kernel': kernels
@@ -119,7 +120,7 @@ for path_dataset in paths_file:
                                         verbose=10,
                                         error_score='raise',
                                         refit ='bal_acc',
-                                        n_jobs=6
+                                        n_jobs=4
                                        )
             tok = time()
             time_train.append(tok-tik)
@@ -159,3 +160,4 @@ for path_dataset in paths_file:
             
         dump(results_dict,'./results/results_{}_f{}.joblib'.format(path_dataset[7:-4],f))   #'sujeto_'+str(sbj)+'_cka_featuresCSP_BCI2a_acc.joblib')
         f += 1
+# %%
