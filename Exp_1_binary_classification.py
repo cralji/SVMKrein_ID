@@ -65,7 +65,7 @@ scores = {'acc': 'accuracy',
 # path_dataset = paths_file[1]
 
 
-for path_dataset in paths_file:
+for path_dataset in paths_file[-1:]:
     data = pd.read_table(path_dataset,delimiter=',',header=None).to_numpy()
     # Data
     X,t = data[:,0:-1].astype(np.float32),data[:,-1].astype(np.str)
