@@ -68,5 +68,5 @@ df = pd.DataFrame(X,columns=name_columns,index=index)
 print(df)
 
 # %%
-df.to_excel('./SVM_krein.xlsx')
+df.to_excel('./SVM_krein_GRFF.xlsx')
 # %%
