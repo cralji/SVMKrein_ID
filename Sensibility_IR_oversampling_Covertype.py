@@ -135,7 +135,7 @@ for IR in [1,2,3,4,5]:
         print('Best Params: {}'.format(gridsearch.best_params_))
         print('Classificacion report\n{}'.format(classification_report(t_test,gridsearch.best_estimator_.predict(Xtest))))
         i += 1
-        name = '{}TWSVM_krein_f{}_IR-{}'.format(root,i,IR)
+        name = '{}SVM_krein_f{}_IR-{}'.format(root,i,IR)
         plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = name)
 
 
