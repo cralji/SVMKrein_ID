@@ -1,6 +1,6 @@
 #%% load libraries
-from Scripts import TWSVM_krein,TWSVM,ETWSVM,EATWSVM
-from kernels import tanh_kernel,TL1
+from SVM_Krein.estimators import SVMK
+from SVM_Krein.kernels import tanh_kernel,TL1
 
 from sklearn.model_selection import StratifiedKFold,GridSearchCV
 from sklearn.metrics import f1_score,balanced_accuracy_score,recall_score,classification_report
@@ -74,12 +74,11 @@ for train_index, test_index in cv1.split(X, t,t):
     for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
         kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
     # kernels.append( TL1(p = 0.7*X.shape[1]) )
-    params_grid = {'c1': C_list,
-                   'c2': C_list,
+    params_grid = {'C': C_list,
                    'kernel': kernels
                  }
 
-    gridsearch = GridSearchCV(TWSVM_krein(),
+    gridsearch = GridSearchCV(SVMK(),
                               param_grid = params_grid,
                               scoring=scores,
                               refit='f1_macro',
@@ -126,116 +125,4 @@ for train_index, test_index in cv1.split(X, t,t):
     i += 1
     plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = './imgs/SVM_f{}'.format(i))
 
-# %% TWSVM
-i = 0
-for train_index, test_index in cv1.split(X, t,t):
-    Xtrain,t_train = X[train_index],t[train_index]
-    Xtest,t_test = X[test_index],t[test_index]
 
-    C_list = [0.001,0.1,1,10]
-    s0 = np.median(pdist(Xtrain))
-    kernels = []
-    gamma_list = [s for s in np.linspace(.1*s0,1.2*s0,5)]
-
-    for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
-        kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
-    
-    params_grid = {'c1':[0.0001,0.001,0.1,1,10],
-                  'c2':[0.0001,0.001,0.1,1,10],
-                  'scale': [1/np.sqrt(2*j) for j in [2**(s) for s in range(-6,7)]]
-                  }
-
-    gridsearch = GridSearchCV(TWSVM(),
-                              param_grid = params_grid,
-                              scoring=scores,
-                              refit='f1_macro',
-                              cv = cv2,
-                              n_jobs=4)
-    gridsearch.fit(Xtrain,t_train)
-
-    print('Best Params: {}'.format(gridsearch.best_params_))
-    print('Classificacion report\n{}'.format(classification_report(t_test,gridsearch.best_estimator_.predict(Xtest))))
-    i += 1
-    plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = './imgs/TWSVM_f{}'.format(i))
-# %%
-import joblib
-
-mdict = joblib.load('X_data')
-X,t = mdict['data']
-cv1 = mdict['cv1']
-cv2 = mdict['cv2']
-
-scores = {'acc': 'accuracy',
-          'f1_macro':'f1_macro',
-          'f1':'f1'}  
-
-# %% ETWSVM
-i = 0
-for train_index, test_index in cv1.split(X, t,t):
-    Xtrain,t_train = X[train_index],t[train_index]
-    Xtest,t_test = X[test_index],t[test_index]
-
-    C_list = [0.001,0.1,1,10]
-    s0 = np.median(pdist(Xtrain))
-    kernels = []
-    gamma_list = [s for s in np.linspace(.1*s0,1.2*s0,5)]
-
-    for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
-        kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
-    params_grid = {'c1':[0.0001,0.001,0.1,1,10],
-                  'c2':[0.0001,0.001,0.1,1,10],
-                  'kernfunction':['rbf'],
-                  'kernparam': [1/np.sqrt(2*j) for j in [2**(s) for s in range(-6,7)]]
-                  }
-    
-
-    gridsearch = GridSearchCV(ETWSVM(),
-                              param_grid = params_grid,
-                              scoring=scores,
-                              refit='f1_macro',
-                              cv = cv2,
-                              n_jobs=4)
-    gridsearch.fit(Xtrain,t_train)
-
-    print('Best Params: {}'.format(gridsearch.best_params_))
-    print('Classificacion report\n{}'.format(classification_report(t_test,gridsearch.best_estimator_.predict(Xtest))))
-    i += 1
-    plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = './imgs/ETWSVM_f{}'.format(i))
-
-# %% EATWSVM
-i = 0
-for train_index, test_index in cv1.split(X, t,t):
-    Xtrain,t_train = X[train_index],t[train_index]
-    Xtest,t_test = X[test_index],t[test_index]
-
-    C_list = [0.001,0.1,1,10]
-    s0 = np.median(pdist(Xtrain))
-    kernels = []
-    gamma_list = [s for s in np.linspace(.1*s0,1.2*s0,5)]
-
-    for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
-        kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
-    params_grid = {'c1':[0.001,0.1,1,10],
-                  'c2': [0.001,0.1,1,10],
-                  'kernfunction':['rbf'],
-                  'kernparam': [1/np.sqrt(2*j) for j in [2**(s) for s in range(-6,7)]]
-                  }
-    
-    try:
-        gridsearch = GridSearchCV(EATWSVM(),
-                                param_grid = params_grid,
-                                scoring=scores,
-                                refit='f1_macro',
-                                cv = cv2,
-                                n_jobs=4)
-                            
-        gridsearch.fit(Xtrain,t_train)
-
-        print('Best Params: {}'.format(gridsearch.best_params_))
-        print('Classificacion report\n{}'.format(classification_report(t_test,gridsearch.best_estimator_.predict(Xtest))))
-        i += 1
-        plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = './imgs/EATWSVM_f{}'.format(i))
-    except:
-        i+=1
-
-# %%
