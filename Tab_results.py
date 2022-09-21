@@ -6,7 +6,7 @@ from tqdm import tqdm
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from SVM_Krein.estimators import SVMK
+from SVM_Krein.estimators import SVMK,TWSVM
 from SVM_Krein.kernels import tanh_kernel
 
 import joblib
@@ -14,7 +14,7 @@ import joblib
 # models_name = ['ETWSVM_krein']
 # folders_results = ['./results_RFF-TWSVM/']
 
-models_name = ['SVMK']
+models_name = ['TWSVM']
 folders_results = ['./results/']
 
 datasets = os.listdir('./data')
@@ -68,5 +68,5 @@ df = pd.DataFrame(X,columns=name_columns,index=index)
 print(df)
 
 # %%
-df.to_excel('./SVM_krein.xlsx')
+df.to_excel('./KTWSVM_krein.xlsx')
 # %%

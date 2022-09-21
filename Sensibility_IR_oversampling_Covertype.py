@@ -1,5 +1,5 @@
 #%% load libraries
-from SVM_Krein.estimators import SVMK
+from SVM_Krein.estimators import SVMK,TWSVM
 from SVM_Krein.kernels import tanh_kernel,TL1,gaussian_delta
 
 from sklearn.model_selection import StratifiedKFold,GridSearchCV
@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.spatial.distance import pdist
 import itertools
-import tikzplotlib
+# import tikzplotlib
 
 
 
@@ -85,7 +85,7 @@ for IR in [1,2,3,4,5]:
         plt.contourf(xx,yy,tt)
         plt.scatter(X[:,0],X[:,1],c=t,cmap='bwr')
         if name is not None:
-            tikzplotlib.save(name+'.tex')
+            # tikzplotlib.save(name+'.tex')
             plt.savefig(name+'.pdf')
         plt.show()
 
@@ -111,17 +111,20 @@ for IR in [1,2,3,4,5]:
         Xtest,t_test = X[test_index],t[test_index]
         
         C_list = [0.00001,0.0001,0.001,0.1,1,10,100]
+        C_ = list(itertools.product(C_list,C_list))
         s0 = np.median(pdist(Xtrain))
         kernels = []
         gamma_list = [s for s in np.linspace(.1*s0,1.2*s0,5)]
-        for sf in [1,1.5,2,3]:
-            for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
-                kernels.append( gaussian_delta(params_kernel={'sigmas':s,'a':[1.0,-1.00001]} ) )
-        params_grid = {'C': C_list,
+        for aa in C_:
+            for sf in [1,1.5,2,3]:
+                for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
+                    kernels.append( gaussian_delta(params_kernel={'sigmas':s,'a':[aa[0],aa[1]]} ) )
+        params_grid = {'c1': C_list,
+                       'c2': C_list,
                     'kernel': kernels
                     }
 
-        gridsearch = GridSearchCV(SVMK(),
+        gridsearch = GridSearchCV(TWSVM(),
                                 param_grid = params_grid,
                                 scoring=scores,
                                 refit='f1_macro',
@@ -130,9 +133,10 @@ for IR in [1,2,3,4,5]:
         gridsearch.fit(Xtrain,t_train)
 
         print('Best Params: {}'.format(gridsearch.best_params_))
+
         print('Classificacion report\n{}'.format(classification_report(t_test,gridsearch.best_estimator_.predict(Xtest))))
         i += 1
-        name = '{}SVM_krein_f{}_IR-{}'.format(root,i,IR)
+        name = '{}TWSVM_krein_f{}_IR-{}'.format(root,i,IR)
         plot_DecisionSpace(gridsearch.best_estimator_,Xtrain,t_train,name = name)
 
 

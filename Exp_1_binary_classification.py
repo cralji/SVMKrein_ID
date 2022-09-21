@@ -5,7 +5,7 @@ import numpy as np
 import os
 from time import time
 
-from SVM_Krein.estimators import SVMK
+from SVM_Krein.estimators import SVMK,TWSVM
 from SVM_Krein.kernels import tanh_kernel
 
 from sklearn.base import BaseEstimator,TransformerMixin,ClassifierMixin
@@ -33,11 +33,11 @@ import pickle
 
 steps = [
          [('zscore',StandardScaler()),
-          ('clf',SVMK())]
+          ('clf',TWSVM())]
         ]
 
 
-name_models = ['Krein_ETWSVM']
+name_models = ['Krein_TWSVM']
 
 #%% List Datasets
 
@@ -65,7 +65,7 @@ scores = {'acc': 'accuracy',
 # path_dataset = paths_file[1]
 
 
-for path_dataset in paths_file:
+for path_dataset in paths_file[-1:]:
     data = pd.read_table(path_dataset,delimiter=',',header=None).to_numpy()
     # Data
     X,t = data[:,0:-1].astype(np.float32),data[:,-1].astype(np.str)
@@ -95,7 +95,8 @@ for path_dataset in paths_file:
         for s in list(itertools.product(gamma_list,np.logspace(-2,2,5))):
             kernels.append( tanh_kernel(gamma=s[0],coef0=s[1]) )
         params_grids = [
-                        {'clf__C': C_list,
+                        {'clf__c1': C_list,
+                         'clf__c2': C_list,
                          'clf__kernel': kernels
                         }
                       ]
@@ -119,7 +120,7 @@ for path_dataset in paths_file:
                                         verbose=10,
                                         error_score='raise',
                                         refit ='bal_acc',
-                                        n_jobs=6
+                                        n_jobs=4
                                        )
             tok = time()
             time_train.append(tok-tik)
